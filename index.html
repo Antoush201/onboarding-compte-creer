@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#fafafa">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="format-detection" content="telephone=no">
+<title>Bienvenue dans OLA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* Branding repris de ola-ai.ca : fond blanc cassé, noir, gris en transparence, Geist, pastilles et cartes arrondies. */
+:root{
+  --bg:#fafafa; --card:#f5f5f5; --white:#ffffff; --fg:#0a0a0a; --fg-2:#555555;
+  --fg-60:rgba(10,10,10,.6); --fg-40:rgba(10,10,10,.4); --fg-12:rgba(10,10,10,.12); --fg-05:rgba(10,10,10,.05);
+  --border:rgba(215,215,215,.6); --border-solid:#d7d7d7;
+  --sans:"Geist","Geist Fallback",-apple-system,BlinkMacSystemFont,"Helvetica Neue",sans-serif;
+  --mono:"Geist Mono","Geist Mono Fallback",ui-monospace,Menlo,monospace;
+  --ease:cubic-bezier(.22,1,.36,1);
+  color-scheme:light;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;width:100%;overflow:hidden;background:var(--bg);color:var(--fg);font-family:var(--sans);
+  -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;-webkit-text-size-adjust:100%;overscroll-behavior:none}
+::selection{background:var(--fg);color:var(--bg)}
+
+/* Diaporama horizontal, on glisse d'une diapo à l'autre */
+.slideshow{display:flex;width:100vw;height:100dvh;overflow-x:hidden;touch-action:pan-y;overflow-y:hidden;scroll-snap-type:x mandatory;scroll-behavior:smooth;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.slideshow::-webkit-scrollbar{display:none}
+.slide{flex:0 0 100vw;width:100vw;height:100dvh;scroll-snap-align:start;scroll-snap-stop:always;overflow-y:auto;overflow-x:hidden;scrollbar-width:none;background:var(--bg);position:relative}
+.slide::-webkit-scrollbar{display:none}
+.slide-inner{min-height:100%;padding:max(6vh,2.5rem) 1.25rem max(22vh,10.5rem);display:flex;flex-direction:column;justify-content:center}
+@media (min-width:768px){.slide-inner{padding:max(8vh,3rem) 3rem max(22vh,11rem);align-items:center}}
+.slide-content{width:100%;max-width:600px;margin:0 auto;display:flex;flex-direction:column}
+
+/* Apparition douce */
+.slide .reveal{opacity:0;transform:translateY(14px);transition:opacity .7s var(--ease),transform .7s var(--ease)}
+.slide.active .reveal{opacity:1;transform:none}
+.slide.active .reveal:nth-child(1){transition-delay:.05s}
+.slide.active .reveal:nth-child(2){transition-delay:.15s}
+.slide.active .reveal:nth-child(3){transition-delay:.25s}
+.slide.active .reveal:nth-child(4){transition-delay:.35s}
+.slide.active .reveal:nth-child(5){transition-delay:.45s}
+
+/* Logo + pastille */
+.logo{height:64px;width:auto;max-width:100%;align-self:flex-start;object-fit:contain;display:block;margin-bottom:2rem}
+@media (min-width:768px){.logo{height:80px}}
+.pill-tag{align-self:flex-start;display:inline-flex;align-items:center;gap:8px;border:1px solid var(--border);background:var(--white);border-radius:999px;padding:6px 14px;font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;margin-bottom:1.5rem}
+.pill-tag i{width:6px;height:6px;border-radius:50%;background:var(--fg);flex:none}
+.pill-tag .ok{width:14px;height:14px;flex:none}
+.pill-tag .n{font-family:var(--mono)}
+
+/* Titres en deux tons, comme le site */
+.hero-title{font-size:2.5rem;font-weight:600;line-height:1.05;letter-spacing:-.03em;margin-bottom:1.25rem;text-wrap:balance}
+@media (min-width:768px){.hero-title{font-size:3.5rem}}
+.hero-title .name{display:block;color:var(--fg-2)}
+.lede{font-size:1.0625rem;color:var(--fg-2);line-height:1.6;max-width:30rem}
+@media (min-width:768px){.lede{font-size:1.1875rem}}
+
+.step-title{font-size:1.75rem;font-weight:600;letter-spacing:-.025em;line-height:1.15;margin-bottom:1rem;text-wrap:balance}
+@media (min-width:768px){.step-title{font-size:2.375rem;margin-bottom:1.25rem}}
+.step-body{font-size:1rem;color:var(--fg-60);line-height:1.65}
+@media (min-width:768px){.step-body{font-size:1.125rem}}
+.step-body strong{color:var(--fg);font-weight:600}
+
+/* Adresses et noms de section */
+.code{font-family:var(--mono);font-size:.875em;font-weight:500;color:var(--fg);background:var(--white);border:1px solid var(--border);border-radius:6px;padding:1px 6px;word-break:break-word;-webkit-box-decoration-break:clone;box-decoration-break:clone}
+
+/* Encadré Important */
+.important{margin-top:1.5rem;background:var(--white);border:1px solid var(--border);border-radius:14px;padding:16px 18px;display:flex;gap:12px;align-items:flex-start}
+.important svg{flex:none;width:20px;height:20px;margin-top:1px}
+.important-label{font-size:.9375rem;font-weight:600;margin-bottom:4px}
+.important-body{font-size:.9375rem;color:var(--fg-60);line-height:1.6}
+
+/* Captures d'écran */
+.step-image{margin-top:1.5rem;border:1px solid var(--border);border-radius:14px;overflow:hidden;line-height:0;background:var(--white);max-width:100%}
+.step-image img{width:100%;height:auto;display:block}
+
+.footer-text{margin-top:2.5rem;padding-top:1.25rem;border-top:1px solid var(--border-solid);font-size:.75rem;color:var(--fg-40);line-height:1.8}
+
+/* Page merci */
+.recap{list-style:none;margin-top:1.75rem;background:var(--white);border:1px solid var(--border);border-radius:16px;padding:4px 18px}
+.recap li{display:flex;align-items:center;gap:12px;padding:14px 0;border-top:1px solid var(--border);font-size:1rem;font-weight:500}
+.recap li:first-child{border-top:0}
+.recap svg{flex:none;width:22px;height:22px}
+.check[hidden]{display:none}
+
+/* Barre du bas : progression + case « C'est fait » */
+.bar{position:fixed;left:50%;transform:translateX(-50%);bottom:max(1rem,env(safe-area-inset-bottom));z-index:100;
+  width:calc(100% - 2rem);max-width:440px;display:flex;flex-direction:column;align-items:stretch;gap:10px;
+  padding:12px;background:rgba(255,255,255,.9);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  border:1px solid var(--border);border-radius:22px;box-shadow:0 8px 32px rgba(10,10,10,.06)}
+.bar-top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:0 6px}
+.dots{display:flex;gap:6px;align-items:center}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--fg-12);transition:all .4s var(--ease);cursor:pointer;border:0;padding:0;-webkit-tap-highlight-color:transparent}
+.dot.done{background:var(--fg-40)}
+.dot.active{background:var(--fg);width:20px;border-radius:4px}
+.dot:disabled{cursor:default}
+.dot:focus-visible{outline:2px solid var(--fg);outline-offset:2px}
+.counter{font-family:var(--mono);font-size:.75rem;color:var(--fg-60);white-space:nowrap}
+
+.check{display:flex;align-items:center;gap:12px;width:100%;min-height:52px;padding:12px 16px;border-radius:14px;cursor:pointer;
+  font:inherit;font-size:.9375rem;font-weight:500;text-align:left;border:1px solid var(--border-solid);background:var(--white);color:var(--fg);
+  transition:background .25s var(--ease),color .25s var(--ease),border-color .25s;-webkit-tap-highlight-color:transparent}
+.check:hover{border-color:var(--fg-40)}
+.check:focus-visible{outline:2px solid var(--fg);outline-offset:2px}
+.check .box{flex:none;width:22px;height:22px;border-radius:7px;border:1.5px solid var(--fg-40);display:flex;align-items:center;justify-content:center;transition:all .25s var(--ease)}
+.check .box svg{width:14px;height:14px;opacity:0;transform:scale(.6);transition:all .25s var(--ease)}
+.check .label{flex:1;min-width:0}
+.check .go{flex:none;width:16px;height:16px;opacity:.5}
+.check[aria-checked="true"]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.check[aria-checked="true"] .box{background:var(--bg);border-color:var(--bg);color:var(--fg)}
+.check[aria-checked="true"] .box svg{opacity:1;transform:none}
+.check.start{background:var(--fg);color:var(--bg);border-color:var(--fg);justify-content:center}
+.check.start .box{display:none}
+.check.start .label{flex:0 1 auto}
+.check.start .go{opacity:1}
+.check.finished{cursor:default}
+.nudge:empty{display:none}
+.nudge{font-size:.8125rem;color:var(--fg-60);text-align:center;padding:0 4px;min-height:1em}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.check.shake{animation:shake .3s}
+
+/* Indice « glisser » au premier coup d'œil */
+.hint{position:fixed;bottom:max(10.5rem,calc(env(safe-area-inset-bottom) + 9.5rem));left:50%;transform:translateX(-50%);font-size:12px;font-weight:500;color:var(--fg-40);
+  pointer-events:none;opacity:0;z-index:99;white-space:nowrap;animation:hintShow 4s ease-out 1.5s forwards}
+@keyframes hintShow{0%{opacity:0}20%{opacity:1}80%{opacity:1}100%{opacity:0}}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}
+  .slide .reveal{opacity:1;transform:none}
+}
+</style>
+</head>
+<body>
+
+<div class="slideshow" id="slideshow">
+
+  <!-- 1 : Bienvenue -->
+  <section class="slide active" data-index="0">
+    <div class="slide-inner">
+      <div class="slide-content">
+        <img src="data:image/webp;base64,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" alt="OLA" class="logo reveal">
+        <span class="pill-tag reveal">
+          <svg class="ok" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7"/></svg>
+          Compte activé
+        </span>
+        <h1 class="hero-title reveal">
+          Bienvenue dans OLA,
+          <span class="name"><span data-token="firstName">courtier</span>.</span>
+        </h1>
+        <p class="lede reveal">Ton compte est prêt. Voici les étapes simples pour démarrer avant notre premier appel ensemble.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2 : Étape 1 -->
+  <section class="slide" data-index="1">
+    <div class="slide-inner">
+      <div class="slide-content">
+        <span class="pill-tag reveal"><i></i>Étape <span class="n">1</span> sur 3</span>
+        <h2 class="step-title reveal">Connecte-toi à OLA</h2>
+        <p class="step-body reveal">
+          Ouvre le courriel reçu à <span class="code" data-token="email">ton adresse</span> provenant de <span class="code">noreply@replies.acct-mgmt.com</span> et clique sur le lien de connexion.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3 : Étape 2 -->
+  <section class="slide" data-index="2">
+    <div class="slide-inner">
+      <div class="slide-content">
+        <span class="pill-tag reveal"><i></i>Étape <span class="n">2</span> sur 3</span>
+        <h2 class="step-title reveal">Trouve la section Aide-Mémoire</h2>
+        <p class="step-body reveal">
+          Sur ton ordinateur, dans OLA, repère le menu de gauche et ouvre la section <span class="code">Aide-Mémoire</span>.
+        </p>
+        <div class="important reveal">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><circle cx="10" cy="10" r="8.25"/><path d="M10 6v4.5"/><circle cx="10" cy="13.75" r=".6" fill="currentColor"/></svg>
+          <div>
+            <p class="important-label">Important</p>
+            <p class="important-body">Dans l'Aide-Mémoire, clique sur « Créer un compte » pour y entrer. C'est une connexion séparée de celle que tu utilises pour OLA.</p>
+          </div>
+        </div>
+        <div class="step-image reveal">
+          <img src="https://assets.cdn.filesafe.space/DL5vmvAkiRP13UUTG58Q/media/6aca631fc478ac55358b613d.png" alt="Section Aide-Mémoire dans OLA" loading="lazy">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4 : Étape 3 -->
+  <section class="slide" data-index="3">
+    <div class="slide-inner">
+      <div class="slide-content">
+        <span class="pill-tag reveal"><i></i>Étape <span class="n">3</span> sur 3</span>
+        <h2 class="step-title reveal">Complète la Configuration</h2>
+        <p class="step-body reveal">
+          En haut de l'Aide-Mémoire, tu trouveras la section <span class="code">Configuration</span>. Fais les connexions de base indiquées. Ça prend <strong>moins de 10 minutes</strong>.
+        </p>
+        <div class="step-image reveal">
+          <img src="https://assets.cdn.filesafe.space/DL5vmvAkiRP13UUTG58Q/media/6aca63214770fb500bd5a658.png" alt="Aperçu de la section Configuration dans OLA" loading="lazy">
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- 5 : Merci -->
+  <section class="slide slide-merci" data-index="4">
+    <div class="slide-inner">
+      <div class="slide-content">
+        <img src="data:image/webp;base64,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" alt="OLA" class="logo reveal">
+        <span class="pill-tag reveal">
+          <svg class="ok" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7"/></svg>
+          Tout est connecté
+        </span>
+        <h2 class="hero-title reveal">
+          Merci, <span data-token="firstName">courtier</span>.
+          <span class="name">Ton compte est prêt.</span>
+        </h2>
+        <p class="lede reveal">On s'occupe du reste de notre côté. On se voit au premier appel pour personnaliser OLA à ta réalité.</p>
+        <ul class="recap reveal">
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10.5" stroke-opacity=".15"/><path d="M7.5 12.4l3 2.9 6-6.3"/></svg>Connecté à OLA</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10.5" stroke-opacity=".15"/><path d="M7.5 12.4l3 2.9 6-6.3"/></svg>Compte Aide-Mémoire créé</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10.5" stroke-opacity=".15"/><path d="M7.5 12.4l3 2.9 6-6.3"/></svg>Configuration complétée</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<div class="hint" id="hint">Fais chaque étape, puis coche-la</div>
+
+<div class="bar" id="bar">
+  <div class="bar-top">
+    <div class="dots" id="dots" aria-label="Progression"></div>
+    <span class="counter" id="counter">0 / 3 fait</span>
+  </div>
+  <button type="button" class="check start" id="check" role="checkbox" aria-checked="false">
+    <span class="box" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 8.5l3 3 6-7"/></svg></span>
+    <span class="label" id="checkLabel">Commencer</span>
+    <svg class="go" id="checkGo" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8h10M8.5 3.5L13 8l-4.5 4.5"/></svg>
+  </button>
+  <p class="nudge" id="nudge" aria-live="polite"></p>
+</div>
+
+<script>
+  // ============================================
+  // PERSONNALISATION par paramètres d'URL (GHL)
+  // Acceptés : ?firstName=X&lastName=Y&email=Z
+  // (aussi first_name, last_name)
+  // ============================================
+  (function personalize() {
+    const params = new URLSearchParams(window.location.search);
+    const values = {
+      firstName: params.get('firstName') || params.get('first_name') || '',
+      lastName: params.get('lastName') || params.get('last_name') || '',
+      email: params.get('email') || ''
+    };
+    document.querySelectorAll('[data-token]').forEach(el => {
+      const value = values[el.dataset.token];
+      // On remplace seulement si GHL a bien rempli la valeur (pas de {{ }} restant)
+      if (value && value.trim() !== '' && !value.includes('{{') && !value.includes('}}')) {
+        el.textContent = value.trim(); // textContent : aucun HTML injecté
+      }
+    });
+  })();
+
+  const slideshow = document.getElementById('slideshow');
+  const slides = document.querySelectorAll('.slide');
+  const dotsContainer = document.getElementById('dots');
+  const counter = document.getElementById('counter');
+  const check = document.getElementById('check');
+  const checkLabel = document.getElementById('checkLabel');
+  const checkGo = document.getElementById('checkGo');
+  const nudge = document.getElementById('nudge');
+  const hint = document.getElementById('hint');
+  const total = slides.length;          // 0 = bienvenue, 1..3 = étapes, dernière = merci
+  const steps = total - 2;
+  const merciIdx = total - 1;
+  let current = 0;
+
+  // Étapes cochées (gardées dans ce navigateur si le client revient)
+  const KEY = 'ola-connexion-etapes';
+  let done = [];
+  try { done = JSON.parse(localStorage.getItem(KEY) || '[]'); } catch (e) { done = []; }
+  const save = () => { try { localStorage.setItem(KEY, JSON.stringify(done)); } catch (e) {} };
+  const isDone = i => done.includes(i);
+  // On peut aller jusqu'à la première étape pas encore cochée
+  const maxReach = () => { for (let i = 1; i <= steps; i++) if (!isDone(i)) return i; return merciIdx; };
+
+  slides.forEach((_, i) => {
+    const dot = document.createElement('button');
+    dot.type = 'button';
+    dot.className = 'dot';
+    dot.setAttribute('aria-label', i === 0 ? 'Bienvenue' : i === merciIdx ? 'Merci' : `Étape ${i}`);
+    dot.addEventListener('click', () => goTo(i));
+    dotsContainer.appendChild(dot);
+  });
+  const dots = document.querySelectorAll('.dot');
+
+  function updateUI() {
+    const reach = maxReach();
+    dots.forEach((d, i) => {
+      d.classList.toggle('active', i === current);
+      d.classList.toggle('done', (i > 0 && isDone(i)) || (i === merciIdx && maxReach() === merciIdx));
+      d.disabled = i > reach;
+    });
+    const n = done.filter(i => i >= 1 && i <= steps).length;
+    counter.textContent = `${n} / ${steps} fait${n > 1 ? 's' : ''}`;
+    slides.forEach((s, i) => s.classList.toggle('active', i === current));
+    nudge.textContent = '';
+    check.classList.remove('finished');
+    check.hidden = current === merciIdx;
+
+    if (current === 0) {
+      check.classList.add('start');
+      check.setAttribute('aria-checked', 'false');
+      check.setAttribute('role', 'button');
+      check.removeAttribute('aria-checked');
+      checkLabel.textContent = 'Commencer';
+      checkGo.style.display = '';
+    } else {
+      check.classList.remove('start');
+      check.setAttribute('role', 'checkbox');
+      const ok = isDone(current);
+      check.setAttribute('aria-checked', ok ? 'true' : 'false');
+      if (ok) {
+        checkLabel.textContent = `Étape ${current} faite · Continuer`;
+        checkGo.style.display = '';
+      } else {
+        checkLabel.textContent = `C'est fait, j'ai complété l'étape ${current}`;
+        checkGo.style.display = 'none';
+      }
+    }
+    if (current > 0) hint.style.display = 'none';
+  }
+
+  function goTo(i, force) {
+    if (i < 0 || i >= total) return;
+    if (!force && i > maxReach()) { blocked(); return; }
+    slideshow.scrollTo({ left: i * slideshow.clientWidth, behavior: 'smooth' });
+    current = i;
+    updateUI();
+  }
+
+  function blocked() {
+    nudge.textContent = "Fais l'étape, puis coche-la pour continuer.";
+    check.classList.remove('shake'); void check.offsetWidth; check.classList.add('shake');
+  }
+
+  check.addEventListener('click', () => {
+    if (current === 0) { goTo(1); return; }
+    if (current === merciIdx) return;
+    if (isDone(current)) { goTo(current + 1); return; }
+    done.push(current); save(); updateUI();
+    setTimeout(() => goTo(current + 1), 650);
+  });
+
+  // Glisser sur cellulaire : on peut revenir, mais avancer seulement si l'étape est cochée
+  let x0 = null, y0 = null;
+  slideshow.addEventListener('touchstart', e => { x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; }, { passive: true });
+  slideshow.addEventListener('touchend', e => {
+    if (x0 === null) return;
+    const dx = e.changedTouches[0].clientX - x0, dy = e.changedTouches[0].clientY - y0;
+    if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.2) { dx < 0 ? goTo(current + 1) : goTo(current - 1); }
+    x0 = y0 = null;
+  });
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === 'PageDown') { e.preventDefault(); goTo(current + 1); }
+    else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); goTo(current - 1); }
+    else if (e.key === 'Home') { goTo(0); }
+  });
+
+  window.addEventListener('load', () => { slideshow.scrollLeft = 0; updateUI(); });
+  window.addEventListener('resize', () => { slideshow.scrollTo({ left: current * slideshow.clientWidth }); });
+  updateUI();
+</script>
+
+</body>
+</html>
