@@ -28,22 +28,18 @@ html,body{height:100%;width:100%;overflow:hidden;background:var(--bg);color:var(
 ::selection{background:var(--fg);color:var(--bg)}
 
 /* Diaporama horizontal, on glisse d'une diapo à l'autre */
-.slideshow{display:flex;width:100vw;height:100dvh;overflow-x:hidden;touch-action:pan-y;overflow-y:hidden;scroll-snap-type:x mandatory;scroll-behavior:smooth;-webkit-overflow-scrolling:touch;scrollbar-width:none}
-.slideshow::-webkit-scrollbar{display:none}
-.slide{flex:0 0 100vw;width:100vw;height:100dvh;scroll-snap-align:start;scroll-snap-stop:always;overflow-y:auto;overflow-x:hidden;scrollbar-width:none;background:var(--bg);position:relative}
+.slideshow{position:fixed;inset:0;overflow:hidden;touch-action:pan-y}
+.slide{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;scrollbar-width:none;background:var(--bg);
+  visibility:hidden;opacity:0;transform:translate3d(28px,0,0);pointer-events:none;
+  transition:opacity .3s ease,transform .3s var(--ease),visibility 0s linear .3s}
+.slide.back{transform:translate3d(-28px,0,0)}
+.slide.active{visibility:visible;opacity:1;transform:none;pointer-events:auto;transition:opacity .3s ease,transform .3s var(--ease),visibility 0s}
 .slide::-webkit-scrollbar{display:none}
 .slide-inner{min-height:100%;padding:max(6vh,2.5rem) 1.25rem max(22vh,10.5rem);display:flex;flex-direction:column;justify-content:center}
 @media (min-width:768px){.slide-inner{padding:max(8vh,3rem) 3rem max(22vh,11rem);align-items:center}}
 .slide-content{width:100%;max-width:600px;margin:0 auto;display:flex;flex-direction:column}
 
-/* Apparition douce */
-.slide .reveal{opacity:0;transform:translateY(14px);transition:opacity .7s var(--ease),transform .7s var(--ease)}
-.slide.active .reveal{opacity:1;transform:none}
-.slide.active .reveal:nth-child(1){transition-delay:.05s}
-.slide.active .reveal:nth-child(2){transition-delay:.15s}
-.slide.active .reveal:nth-child(3){transition-delay:.25s}
-.slide.active .reveal:nth-child(4){transition-delay:.35s}
-.slide.active .reveal:nth-child(5){transition-delay:.45s}
+/* Le contenu arrive avec la diapo (une seule animation, légère sur cellulaire) */
 
 /* Logo + pastille */
 .logo{height:64px;width:auto;max-width:100%;align-self:flex-start;object-fit:contain;display:block;margin-bottom:2rem}
@@ -89,9 +85,9 @@ html,body{height:100%;width:100%;overflow:hidden;background:var(--bg);color:var(
 .check[hidden]{display:none}
 
 /* Barre du bas : progression + case « C'est fait » */
-.bar{position:fixed;left:50%;transform:translateX(-50%);bottom:max(1rem,env(safe-area-inset-bottom));z-index:100;
+.bar{position:fixed;left:0;right:0;margin:0 auto;bottom:max(1rem,env(safe-area-inset-bottom));z-index:100;
   width:calc(100% - 2rem);max-width:440px;display:flex;flex-direction:column;align-items:stretch;gap:10px;
-  padding:12px;background:rgba(255,255,255,.9);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  padding:12px;background:var(--white);
   border:1px solid var(--border);border-radius:22px;box-shadow:0 8px 32px rgba(10,10,10,.06)}
 .bar-top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:0 6px}
 .dots{display:flex;gap:6px;align-items:center}
@@ -131,7 +127,7 @@ html,body{height:100%;width:100%;overflow:hidden;background:var(--bg);color:var(
 
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}
-  .slide .reveal{opacity:1;transform:none}
+  .slide,.slide.back{transform:none}
 }
 </style>
 </head>
@@ -187,7 +183,7 @@ html,body{height:100%;width:100%;overflow:hidden;background:var(--bg);color:var(
           </div>
         </div>
         <div class="step-image reveal">
-          <img src="https://assets.cdn.filesafe.space/DL5vmvAkiRP13UUTG58Q/media/6aca631fc478ac55358b613d.png" alt="Section Aide-Mémoire dans OLA" loading="lazy">
+          <img src="https://assets.cdn.filesafe.space/DL5vmvAkiRP13UUTG58Q/media/6aca631fc478ac55358b613d.png" alt="Section Aide-Mémoire dans OLA" decoding="async">
         </div>
       </div>
     </div>
@@ -203,7 +199,7 @@ html,body{height:100%;width:100%;overflow:hidden;background:var(--bg);color:var(
           En haut de l'Aide-Mémoire, tu trouveras la section <span class="code">Configuration</span>. Fais les connexions de base indiquées. Ça prend <strong>moins de 10 minutes</strong>.
         </p>
         <div class="step-image reveal">
-          <img src="https://assets.cdn.filesafe.space/DL5vmvAkiRP13UUTG58Q/media/6aca63214770fb500bd5a658.png" alt="Aperçu de la section Configuration dans OLA" loading="lazy">
+          <img src="https://assets.cdn.filesafe.space/DL5vmvAkiRP13UUTG58Q/media/6aca63214770fb500bd5a658.png" alt="Aperçu de la section Configuration dans OLA" decoding="async">
         </div>
       </div>
     </div>
@@ -345,8 +341,10 @@ html,body{height:100%;width:100%;overflow:hidden;background:var(--bg);color:var(
   function goTo(i, force) {
     if (i < 0 || i >= total) return;
     if (!force && i > maxReach()) { blocked(); return; }
-    slideshow.scrollTo({ left: i * slideshow.clientWidth, behavior: 'smooth' });
+    const back = i < current;
+    slides.forEach((s, k) => s.classList.toggle('back', back ? k > i : k < i));
     current = i;
+    slides[i].scrollTop = 0;
     updateUI();
   }
 
@@ -360,7 +358,8 @@ html,body{height:100%;width:100%;overflow:hidden;background:var(--bg);color:var(
     if (current === merciIdx) return;
     if (isDone(current)) { goTo(current + 1); return; }
     done.push(current); save(); updateUI();
-    setTimeout(() => goTo(current + 1), 650);
+    const from = current;
+    setTimeout(() => { if (current === from) goTo(from + 1); }, 450);
   });
 
   // Glisser sur cellulaire : on peut revenir, mais avancer seulement si l'étape est cochée
@@ -369,7 +368,7 @@ html,body{height:100%;width:100%;overflow:hidden;background:var(--bg);color:var(
   slideshow.addEventListener('touchend', e => {
     if (x0 === null) return;
     const dx = e.changedTouches[0].clientX - x0, dy = e.changedTouches[0].clientY - y0;
-    if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.2) { dx < 0 ? goTo(current + 1) : goTo(current - 1); }
+    if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) { dx < 0 ? goTo(current + 1) : goTo(current - 1); }
     x0 = y0 = null;
   });
 
@@ -379,8 +378,6 @@ html,body{height:100%;width:100%;overflow:hidden;background:var(--bg);color:var(
     else if (e.key === 'Home') { goTo(0); }
   });
 
-  window.addEventListener('load', () => { slideshow.scrollLeft = 0; updateUI(); });
-  window.addEventListener('resize', () => { slideshow.scrollTo({ left: current * slideshow.clientWidth }); });
   updateUI();
 </script>
 
